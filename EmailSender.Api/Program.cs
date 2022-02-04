@@ -1,7 +1,14 @@
+using EmailSender.Api.Data.DbInterop;
+using EmailSender.Api.Data.Entities;
+using EmailSender.Api.Data.Entities.Attachments;
 using EmailSender.Api.Data.Models;
+using EmailSender.Api.Data.Storage;
+using EmailSender.Api.Internal;
 using EmailSender.Api.Smtp;
 
 using MailKit.Net.Smtp;
+
+using Microsoft.Data.Sqlite;
 
 using MimeKit;
 
@@ -43,6 +50,31 @@ builder.Services.AddTransient<SmtpSession>(provider =>
 
     return new SmtpSession(client, server, new MailboxAddress(name, address));
 });
+
+// Configure SQLite
+var appPath = AppDomain.CurrentDomain.BaseDirectory;
+var sqlitePath = Path.Combine(appPath, ".sqlite");
+Directory.CreateDirectory(sqlitePath);
+
+builder.Services.AddSingleton<IDbConnectionFactory<SqliteConnection>,
+    SqliteConnectionFactory>(provider =>
+{
+    var builder = new SqliteConnectionStringBuilder()
+    {
+        Cache = SqliteCacheMode.Shared,
+        DataSource = Path.Combine(sqlitePath, "emails.db")
+    };
+
+    var factory = new SqliteConnectionFactory(builder.ConnectionString);
+    new CreateSqliteEmailsDbQuery(factory).Execute();
+    return factory;
+});
+
+builder.Services.AddSingleton<IRepository<long, EmailBase, Email>,
+    SqliteEmailsRepository>();
+
+builder.Services.AddSingleton<IAttachmentsRepository<long, Email, EmailStatus>,
+    SqliteEmailsStatusesRepository>();
 
 // Configure controllers
 builder.Services.AddControllers();
