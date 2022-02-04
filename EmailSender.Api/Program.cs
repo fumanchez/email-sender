@@ -2,6 +2,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
 
+// Configure routing
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+});
+
 // Configure controllers
 builder.Services.AddControllers();
 
