@@ -1,0 +1,31 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+max_line_length = off
+
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*{conf,config,proj,rc}]
+indent_size = unset
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.{cs,fs,vb}]
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+[*.{cs,cshtml,razor}]
+csharp_space_after_cast = true
+
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+csharp_style_namespace_declarations = file_scoped:suggestion
